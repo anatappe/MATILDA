@@ -7,10 +7,9 @@ The MATILDA model connects the HBV model (Bergström, 1986), a simple hydrologic
 MATILDA uses a modified version of the pypdd tool (https://github.com/juseg/pypdd.git) to calculate runoff from the glacier(s) with a simple DegreeDayModel approach and a modified version of the LHMP tool (https://github.com/hydrogo/LHMP.git) which translates the HBV model into python. It can run on input data from COSIPY, the translation of the COSIMA model into python (https://github.com/cryotools/cosipy.git).
 
 ### Requirements
-Clone
-```
+
 Clone this repo to your local machine using https://github.com/anatappe/MATILDA.git
-```
+
 
 The tool should run with any Python3 version on any computer operating system. It was developed on Python 3.6.9 on Ubuntu 18.04.
 It requires the following Python3 libraries:
@@ -22,11 +21,16 @@ It requires the following Python3 libraries:
 - os
 - datetime
 
-The MATILDA package and the necessary packages can be installed to you local machine by using pip. Just navigate into the cloned folder and use the following command:
+The MATILDA package and the necessary packages can be installed to you local machine by using pip. Just navigate into the cloned folder and use the following command
 ```
 pip install .
 ```
+or install the package directly from the source by using
 
+```
+pip install git+https://git@github.com/anatappe/MATILDA.git
+
+```
 ### Data
 
 The necessary input a either a csv with a time series of temperature (°C), precipitation (mm) and if possible evapotranspiration (mm) data in the following format or the output netcdf and csv from the COSIPY model. A series of runoff observations (mm) are used to validate the model output.
