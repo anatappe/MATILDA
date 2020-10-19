@@ -80,8 +80,8 @@ lapse_rate_precipitation = 0
 height_diff = 21 # height difference between AWS (4025) and glacier (4036) in m
 
 cal_exclude = False # Include or exclude the calibration period
-plot_frequency = "Weekly" # possible options are Daily, Weekly, Monthly or Yearly
-plot_save = True # saves plot in folder, otherwise just shows it in Python
+plot_frequency = "M" # possible options are "D" (daily), "W" (weekly), "M" (monthly) or "Y" (yearly)
+plot_frequency_long = "Monthly" # Daily, Weekly, Monthly or Yearlyplot_save = True # saves plot in folder, otherwise just shows it in Python
 
 ## Data input preprocessing
 print('---')
@@ -123,24 +123,11 @@ output = output.fillna(0)
 output.to_csv(output_path + "model_output_" +str(cal_period_start[:4])+"-"+str(sim_period_end[:4]+".csv"))
 
 ## Statistical analysis
-# Daily, monthly or yearly output
-if plot_frequency == "Daily":
-    plot_data = output_calibration.copy()
-elif plot_frequency == "Weekly":
-    plot_data = output_calibration.resample("W").agg(
-        {"T2": "mean", "RRR": "sum", "PE": "sum", "Q_HBV": "sum", "Qobs": "sum", \
-         "Q_DDM": "sum", "Q_Total": "sum", "HBV_AET": "sum", "HBV_snowpack": "mean", \
-         "HBV_soil_moisture": "mean", "HBV_upper_gw": "mean", "HBV_lower_gw": "mean"})
-elif plot_frequency == "Monthly":
-    plot_data = output_calibration.resample("M").agg(
-        {"T2": "mean", "RRR": "sum", "PE": "sum", "Q_HBV": "sum", "Qobs": "sum", \
-         "Q_DDM": "sum", "Q_Total": "sum", "HBV_AET": "sum", "HBV_snowpack": "mean", \
-         "HBV_soil_moisture": "mean", "HBV_upper_gw": "mean", "HBV_lower_gw": "mean"})
-elif plot_frequency == "Yearly":
-    plot_data = output_calibration.resample("Y").agg(
-        {"T2": "mean", "RRR": "sum", "PE": "sum", "Q_HBV": "sum", "Qobs": "sum", \
-         "Q_DDM": "sum", "Q_Total": "sum", "HBV_AET": "sum", "HBV_snowpack": "mean", \
-         "HBV_soil_moisture": "mean", "HBV_upper_gw": "mean", "HBV_lower_gw": "mean"})
+# Daily, weekly, monthly or yearly output
+plot_data = output_calibration.resample(plot_frequency).agg(
+    {"T2": "mean", "RRR": "sum", "PE": "sum", "Q_HBV": "sum", "Qobs": "sum", \
+    "Q_DDM": "sum", "Q_Total": "sum", "HBV_AET": "sum", "HBV_snowpack": "mean", \
+    "HBV_soil_moisture": "mean", "HBV_upper_gw": "mean", "HBV_lower_gw": "mean"})
 
 stats_output = stats.create_statistics(output_calibration)
 stats_output.to_csv(output_path + "model_stats_" +str(output_calibration.index.values[1])[:4]+"-"+str(output_calibration.index.values[-1])[:4]+".csv")
@@ -148,21 +135,21 @@ stats_output.to_csv(output_path + "model_stats_" +str(output_calibration.index.v
 
 ## Plotting the output data
 # Plot the meteorological data
-fig = plots.plot_meteo(plot_data, plot_frequency)
+fig = plots.plot_meteo(plot_data, plot_frequency_long)
 if plot_save == False:
 	plt.show()
 else:
 	plt.savefig(output_path + "meteorological_data_"+str(plot_data.index.values[1])[:4]+"-"+str(plot_data.index.values[-1])[:4]+".png")
 
 # Plot the runoff data
-fig1 = plots.plot_runoff(plot_data, plot_frequency, nash_sut)
+fig1 = plots.plot_runoff(plot_data, plot_frequency_long, nash_sut)
 if plot_save == False:
 	plt.show()
 else:
 	plt.savefig(output_path + "model_runoff_"+str(plot_data.index.values[1])[:4]+"-"+str(plot_data.index.values[-1])[:4]+".png")
 
 # Plot the HBV paramters
-fig2 = plots.plot_hbv(plot_data, plot_frequency)
+fig2 = plots.plot_hbv(plot_data, plot_frequency_long)
 if plot_save == False:
 	plt.show()
 else:
