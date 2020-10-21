@@ -12,46 +12,44 @@ List of 16 HBV model parameters
     parCFMAX, parSFCF, parCFR,   parCWH]
 
     # 16 PARAMETERS_HBV
-    # BETA   - parameter that determines the relative contribution to runoff from rain or snowmelt
+    # BETA   - Parameter that determines the relative contribution to runoff from rain or snow melt
     #          [1, 6]
     # CET    - Evaporation correction factor
     #          (should be 0 if we don't want to change (Oudin et al., 2005) formula values)
     #          [0, 0.3]
-    # FC     - maximum soil moisture storage
+    # FC     - Maximum soil moisture storage
     #          [50, 500]
-    # K0     - recession coefficient for surface soil box (upper part of SUZ)
+    # K0     - Recession coefficient for surface soil box (upper part of SUZ)
     #          [0.01, 0.4]
-    # K1     - recession coefficient for upper groudwater box (main part of SUZ)
+    # K1     - Recession coefficient for upper groundwater box (main part of SUZ)
     #          [0.01, 0.4]
-    # K2     - recession coefficient for lower groudwater box (whole SLZ)
+    # K2     - Recession coefficient for lower groundwater box (whole SLZ)
     #          [0.001, 0.15]
     # LP     - Threshold for reduction of evaporation (SM/FC)
     #          [0.3, 1]
-    # MAXBAS - routing parameter, order of Butterworth filter
+    # MAXBAS - Routing parameter, order of Butterworth filter
     #          [1, 7]
-    # PERC   - percolation from soil to upper groundwater box
+    # PERC   - Percolation from soil to upper groundwater box
     #          [0, 3]
-    # UZL    - threshold parameter for groundwater boxes runoff (mm)
+    # UZL    - Threshold parameter for groundwater boxes runoff (mm)
     #          [0, 500]
     # PCORR  - Precipitation (input sum) correction factor
     #          [0.5, 2]
-    # TT     - Temperature which separate rain and snow fraction of precipitation
+    # TT     - Temperature which separates rain and snow fraction of precipitation
     #          [-1.5, 2.5]
     # CFMAX  - Snow melting rate (mm/day per Celsius degree)
     #          [1, 10]
-    # SFCF   - SnowFall Correction Factor
+    # SFCF   - Snowfall correction Factor
     #          [0.4, 1]
     # CFR    - Refreezing coefficient
     #          [0, 0.1] (usually 0.05)
-    # CWH    - Fraction (portion) of meltwater and rainfall which retain in snowpack (water holding capacity)
+    # CWH    - Fraction of meltwater and rainfall that retains in snowpack (water holding capacity)
     #          [0, 0.2] (usually 0.1)
 """
 
-import numpy as npthey
 import pandas as pd
 import scipy.signal as ss
 import numpy as np
-
 def hbv_simulation(df, cal_period_start, cal_period_end, parBETA=1.0, parCET=0.15,  parFC=250, parK0=0.055, parK1=0.055, \
                    parK2=0.04, parLP=0.7, parMAXBAS=3.0, parPERC=1.5, parUZL=120, parPCORR=1.0, parTT=0.0, parCFMAX=5.0, \
                    parSFCF=0.7, parCFR=0.05, parCWH=0.1):
@@ -62,6 +60,8 @@ def hbv_simulation(df, cal_period_start, cal_period_end, parBETA=1.0, parCET=0.1
        df_hbv = df.resample("D").agg({"T2": 'mean', "RRR": 'sum'})
 
     Temp = df_hbv['T2']
+    if Temp[1] >= 100:  # making sure the temperature is in Celsius
+        Temp = Temp - 273.15
     Prec = df_hbv['RRR']
 
     # Calculation of PE with Oudin et al. 2005
@@ -316,8 +316,7 @@ def hbv_simulation(df, cal_period_start, cal_period_end, parBETA=1.0, parCET=0.1
     Qsim_smoothed = np.where(Qsim_smoothed > 0, Qsim_smoothed, 0)
 
     Qsim = Qsim_smoothed
-    hbv_results = pd.DataFrame({"HBV_snowpack": SNOWPACK, "HBV_soil_moisture": SM, "HBV_AET": ETact, \
+    hbv_results = pd.DataFrame({"T2":Temp, "RRR":Prec, "PE":Evap, "HBV_snowpack": SNOWPACK, "HBV_soil_moisture": SM, "HBV_AET": ETact, \
                                 "HBV_upper_gw": SUZ,"HBV_lower_gw": SLZ, "Q_HBV": Qsim}, index=df_hbv.index)
-    hbv_results = pd.concat([df_hbv, hbv_results], axis=1)
     hbv_results = hbv_results.round(3)
     return hbv_results
