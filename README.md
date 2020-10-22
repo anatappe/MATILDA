@@ -169,8 +169,8 @@ print('---')
 
 ## Authors
 
-* **Phillip Schuster** - *Initial work* - (https://github.com/anatappe)
-* **Ana-Lena Tappe** - *Initial work* - (https://scm.cms.hu-berlin.de/tappelen)
+* **Phillip Schuster** - *Initial work* - (https://github.com/phiscu)
+* **Ana-Lena Tappe** - *Initial work* - (https://github.com/anatappe)
 
 
 See also the list of [contributors](https://scm.cms.hu-berlin.de/sneidecy/centralasiawaterresources/-/graphs/master) who participated in this project.
