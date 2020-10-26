@@ -1,10 +1,10 @@
 # MATILDA - Modeling water resources In glacierized catchments
 
-The MATILDA model connects the HBV model (Bergström, 1986), a simple hydrological bucket model, which computes runoff and a simple DDM approach to compute the glacier melt. It can also be connected to the glacier mass balance model COSIPY (COupled Snow and Ice energy and MAss Balance in Python) to calculate glacier model instead of the DDM. The aim is to generate runoff projections under different climate scenarios and use the results to help planing future water management strategies in the modeled catchments. 
+The MATILDA model connects the HBV model (Bergström, 1986), a simple hydrological bucket model, which computes runoff and a simple DDM approach to compute the glacier melt. It can also be connected to the glacier mass balance model COSIPY (COupled Snow and Ice energy and MAss Balance in Python) to calculate glacier melt instead of the DDM. The aim is to generate runoff projections under different climate scenarios and use the results to help planing future water management strategies in the modeled catchments. 
 
 ## Overview
 
-MATILDA uses a modified version of the pypdd tool (https://github.com/juseg/pypdd.git) to calculate runoff from the glacier(s) with a simple DegreeDayModel approach and a modified version of the LHMP tool (https://github.com/hydrogo/LHMP.git) which translates the HBV model into python. It can run on input data from COSIPY, the translation of the COSIMA model into python (https://github.com/cryotools/cosipy.git), and use COSIPY output to simulate glacier melt.
+MATILDA uses a modified version of the pypdd tool (https://github.com/juseg/pypdd.git) to calculate runoff from the glacier(s) with a simple DegreeDayModel approach and a modified version of the LHMP tool (https://github.com/hydrogo/LHMP.git) which translates the HBV model into python. It can run on input data from COSIPY, the translation of the COSIMA model into python (https://github.com/cryotools/cosipy.git), and use the COSIPY output to simulate glacier melt instead of the DDM. The output is then combined and analyzed. The Nash-Sutcliffe efficiency coefficient is calculated to evaluate the predictive skills of the model and several plots are generated to give an overview of the data.
 
 ![](MATILDA_overview.png)
 
