@@ -1,10 +1,10 @@
 # MATILDA - Modeling water resources In glacierized catchments
 
-The MATILDA model connects the HBV model (Bergström, 1986), a simple hydrological bucket model, which computes runoff and a simple DDM approach to compute the glacier melt. It may also be connected to the glacier mass balance model COSIPY (COupled Snow and Ice energy and MAss Balance in Python). The aim is to generate runoff projections under different climate scenarios and use the results to help planing future water management strategies in the modeled catchments. 
+The MATILDA model connects the HBV model (Bergström, 1986), a simple hydrological bucket model, which computes runoff and a simple DDM approach to compute the glacier melt. It can also be connected to the glacier mass balance model COSIPY (COupled Snow and Ice energy and MAss Balance in Python) to calculate glacier model instead of the DDM. The aim is to generate runoff projections under different climate scenarios and use the results to help planing future water management strategies in the modeled catchments. 
 
 ## Overview
 
-MATILDA uses a modified version of the pypdd tool (https://github.com/juseg/pypdd.git) to calculate runoff from the glacier(s) with a simple DegreeDayModel approach and a modified version of the LHMP tool (https://github.com/hydrogo/LHMP.git) which translates the HBV model into python. It can run on input data from COSIPY, the translation of the COSIMA model into python (https://github.com/cryotools/cosipy.git).
+MATILDA uses a modified version of the pypdd tool (https://github.com/juseg/pypdd.git) to calculate runoff from the glacier(s) with a simple DegreeDayModel approach and a modified version of the LHMP tool (https://github.com/hydrogo/LHMP.git) which translates the HBV model into python. It can run on input data from COSIPY, the translation of the COSIMA model into python (https://github.com/cryotools/cosipy.git), and use COSIPY output to simulate glacier melt.
 
 ### Requirements
 
@@ -33,7 +33,7 @@ pip install git+https://git@github.com/anatappe/MATILDA.git
 ```
 ### Data
 
-The necessary input a either a csv with a time series of temperature (°C), precipitation (mm) and if possible evapotranspiration (mm) data in the following format or the output netcdf and csv from the COSIPY model. A series of runoff observations (mm) are used to validate the model output.
+The necessary input a either a csv with a time series of temperature (°C), precipitation (mm) and if possible evapotranspiration (mm) data in the following format or the output netcdf and csv from the COSIPY model. A series of runoff observations (mm) are used to validate the model output. At least daily data is required.
 
 | TIMESTAMP            | T2            | RRR            | PE            |
 | -------------        | ------------- | -------------  | ------------- |
@@ -98,17 +98,20 @@ df_DDM = df.copy()
 df_DDM["T2"] = df_DDM["T2"] + height_diff * float(lapse_rate_temperature)
 df_DDM["RRR"] = df_DDM["RRR"] + height_diff * float(lapse_rate_precipitation)
 
-## DDM model
-print("Running the degree day model")
 # Calculating the positive degree days
-degreedays_ds = DDM.calculate_PDD(ds) # include either downscaled glacier dataframe or dataset with mask
+print("Calculating the positive degree days")
+degreedays_ds = DDM.calculate_PDD(df_DDM)
+print("Calculating melt with the DDM")
+# include either downscaled glacier dataframe or dataset with mask
 # Calculating runoff and melt
 output_DDM = DDM.calculate_glaciermelt(degreedays_ds) # output in mm, parameter adjustment possible
+print("Finished running the DDM")
 
 ## HBV model
 print("Running the HBV model")
 # Runoff calculations for the catchment with the HBV model
 output_hbv = HBV.hbv_simulation(df, cal_period_start, cal_period_end) # output in mm, individual parameters can be set here
+print("Finished running the HBV")
 
 ## Output postprocessing
 output = pd.concat([output_hbv, output_DDM], axis=1)
@@ -128,6 +131,7 @@ plot_data = output_calibration.resample(plot_frequency).agg(
     {"T2": "mean", "RRR": "sum", "PE": "sum", "Q_HBV": "sum", "Qobs": "sum", \
     "Q_DDM": "sum", "Q_Total": "sum", "HBV_AET": "sum", "HBV_snowpack": "mean", \
     "HBV_soil_moisture": "mean", "HBV_upper_gw": "mean", "HBV_lower_gw": "mean"})
+plot_data = plot_data[cal_period_start: sim_period_end]
 
 stats_output = stats.create_statistics(output_calibration)
 stats_output.to_csv(output_path + "model_stats_" +str(output_calibration.index.values[1])[:4]+"-"+str(output_calibration.index.values[-1])[:4]+".csv")
@@ -164,7 +168,7 @@ print('---')
 ## Built With
 * [Python](https://www.python.org) - Python
 * [COSIPY](https://github.com/cryotools/cosipy.git) - COupled Snow and Ice energy and MAss Balance in Python
-* [pypdd](ttps://github.com/juseg/pypdd.git) - Python positive degree day model for glacier surface mass balance
+* [pypdd](https://github.com/juseg/pypdd.git) - Python positive degree day model for glacier surface mass balance
 * [LHMB](https://rometools.github.io/rome/) - Lumped Hydrological Models Playgroud - HBV Model
 
 ## Authors
