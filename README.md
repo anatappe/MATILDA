@@ -81,39 +81,27 @@ lapse_rate_temperature = -0.006 # K/m
 lapse_rate_precipitation = 0
 height_diff = 21 # height difference between AWS (4025) and glacier (4036) in m
 
-cal_exclude = False # Include or exclude the calibration period
 plot_frequency = "M" # possible options are "D" (daily), "W" (weekly), "M" (monthly) or "Y" (yearly)
-plot_frequency_long = "Monthly" # Daily, Weekly, Monthly or Yearlyplot_save = True # saves plot in folder, otherwise just shows it in Python
+plot_frequency_long = "Monthly" # Daily, Weekly, Monthly or Yearly
 
 ## Data input preprocessing
-print('---')
-print('Starting MATILDA model run')
-print('Read input csv file %s' % (data_csv))
-print('Read observation data %s' % (observation_data))
 df = pd.read_csv(working_directory + data_csv)
 obs = pd.read_csv(working_directory + observation_data)
 
-print("Spin up period between " + str(cal_period_start) + " and "  + str(cal_period_end))
-print("Simulation period between " + str(sim_period_start) + " and "  + str(sim_period_end))
 # Downscaling the dataframe to the glacier height
 df_DDM = df.copy()
 df_DDM["T2"] = df_DDM["T2"] + height_diff * float(lapse_rate_temperature)
 df_DDM["RRR"] = df_DDM["RRR"] + height_diff * float(lapse_rate_precipitation)
 
 # Calculating the positive degree days
-print("Calculating the positive degree days")
 degreedays_ds = DDM.calculate_PDD(df_DDM)
-print("Calculating melt with the DDM")
 # include either downscaled glacier dataframe or dataset with mask
 # Calculating runoff and melt
 output_DDM = DDM.calculate_glaciermelt(degreedays_ds) # output in mm, parameter adjustment possible
-print("Finished running the DDM")
 
 ## HBV model
-print("Running the HBV model")
 # Runoff calculations for the catchment with the HBV model
 output_hbv = HBV.hbv_simulation(df, cal_period_start, cal_period_end) # output in mm, individual parameters can be set here
-print("Finished running the HBV")
 
 ## Output postprocessing
 output = pd.concat([output_hbv, output_DDM], axis=1)
@@ -121,10 +109,7 @@ output = pd.concat([output, obs], axis=1)
 output["Q_Total"] = output["Q_HBV"] + output["Q_DDM"]
 
 nash_sut = stats.NS(output["Qobs"], output["Q_Total"]) # Nash–Sutcliffe model efficiency coefficient
-print("The Nash–Sutcliffe model efficiency coefficient of the total model is " + str(round(nash_sut, 2)))
 
-print("Writing the output csv to disc")
-output = output.fillna(0)
 output.to_csv(output_path + "model_output_" +str(cal_period_start[:4])+"-"+str(sim_period_end[:4]+".csv"))
 
 ## Statistical analysis
@@ -138,32 +123,18 @@ plot_data = plot_data[cal_period_start: sim_period_end]
 stats_output = stats.create_statistics(output_calibration)
 stats_output.to_csv(output_path + "model_stats_" +str(output_calibration.index.values[1])[:4]+"-"+str(output_calibration.index.values[-1])[:4]+".csv")
 
-
 ## Plotting the output data
 # Plot the meteorological data
 fig = plots.plot_meteo(plot_data, plot_frequency_long)
-if plot_save == False:
-	plt.show()
-else:
-	plt.savefig(output_path + "meteorological_data_"+str(plot_data.index.values[1])[:4]+"-"+str(plot_data.index.values[-1])[:4]+".png")
+plt.show()
 
 # Plot the runoff data
 fig1 = plots.plot_runoff(plot_data, plot_frequency_long, nash_sut)
-if plot_save == False:
-	plt.show()
-else:
-	plt.savefig(output_path + "model_runoff_"+str(plot_data.index.values[1])[:4]+"-"+str(plot_data.index.values[-1])[:4]+".png")
+plt.show()
 
 # Plot the HBV paramters
 fig2 = plots.plot_hbv(plot_data, plot_frequency_long)
-if plot_save == False:
-	plt.show()
-else:
-	plt.savefig(output_path + "HBV_output_"+str(plot_data.index.values[1])[:4]+"-"+str(plot_data.index.values[-1])[:4]+".png")
-
-print('Saved plots of meteorological and runoff data to disc')
-print("End of model run")
-print('---')
+plt.show()
 ```
 
 
