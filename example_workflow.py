@@ -1,4 +1,4 @@
-from MATILDA import DDM, HBV, stats, plots
+from MATILDA import dataformatting, DDM, HBV, stats, plots
 
 working_directory = "...MATILDA/"
 data_csv = "data_2010-2019.csv"
@@ -10,10 +10,6 @@ cal_period_end = '2010-12-31 23:00:00' # end of period: one year is recommended
 sim_period_start = '2011-01-01 00:00:00' # beginning of simulation period
 sim_period_end = '2019-12-31 23:00:00'
 
-lapse_rate_temperature = -0.006 # K/m
-lapse_rate_precipitation = 0
-height_diff = 21 # height difference between AWS (4025) and glacier (4036) in m
-
 plot_frequency = "M" # possible options are "D" (daily), "W" (weekly), "M" (monthly) or "Y" (yearly)
 plot_frequency_long = "Monthly" # Daily, Weekly, Monthly or Yearly
 
@@ -22,9 +18,7 @@ df = pd.read_csv(working_directory + data_csv)
 obs = pd.read_csv(working_directory + observation_data)
 
 # Downscaling the dataframe to the glacier height
-df_DDM = df.copy()
-df_DDM["T2"] = df_DDM["T2"] + height_diff * float(lapse_rate_temperature)
-df_DDM["RRR"] = df_DDM["RRR"] + height_diff * float(lapse_rate_precipitation)
+df_DDM = dataformatting.glacier_downscaling(df, height_diff=21, lapse_rate_temperature=-0.006, lapse_rate_precipitation=0)
 
 # Calculating the positive degree days
 degreedays_ds = DDM.calculate_PDD(df_DDM)
@@ -37,21 +31,14 @@ output_DDM = DDM.calculate_glaciermelt(degreedays_ds) # output in mm, parameter 
 output_hbv = HBV.hbv_simulation(df, cal_period_start, cal_period_end) # output in mm, individual parameters can be set here
 
 ## Output postprocessing
-output = pd.concat([output_hbv, output_DDM], axis=1)
-output = pd.concat([output, obs], axis=1)
-output["Q_Total"] = output["Q_HBV"] + output["Q_DDM"]
+output = dataformatting.output_postproc(output_hbv, output_DDM, obs)
 
 nash_sut = stats.NS(output["Qobs"], output["Q_Total"]) # Nash–Sutcliffe model efficiency coefficient
 
 output.to_csv(output_path + "model_output_" +str(cal_period_start[:4])+"-"+str(sim_period_end[:4]+".csv"))
 
 ## Statistical analysis
-# Daily, weekly, monthly or yearly output
-plot_data = output_calibration.resample(plot_frequency).agg(
-    {"T2": "mean", "RRR": "sum", "PE": "sum", "Q_HBV": "sum", "Qobs": "sum", \
-    "Q_DDM": "sum", "Q_Total": "sum", "HBV_AET": "sum", "HBV_snowpack": "mean", \
-    "HBV_soil_moisture": "mean", "HBV_upper_gw": "mean", "HBV_lower_gw": "mean"})
-plot_data = plot_data[cal_period_start: sim_period_end]
+plot_data = dataformatting.plot_data(output, plot_frequency, cal_period_start, sim_period_end)
 
 stats_output = stats.create_statistics(output_calibration)
 stats_output.to_csv(output_path + "model_stats_" +str(output_calibration.index.values[1])[:4]+"-"+str(output_calibration.index.values[-1])[:4]+".csv")
