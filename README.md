@@ -1,10 +1,11 @@
-# MATILDA - Modeling water resources In glacierized catchments
+# MATILDA - Modeling Water Resources in Glacierized Catchments
 
-The MATILDA model connects the HBV model (Bergström, 1986), a simple hydrological bucket model, which computes runoff and a simple DDM approach to compute the glacier melt. It can also be connected to the glacier mass balance model COSIPY (COupled Snow and Ice energy and MAss Balance in Python) to calculate glacier melt instead of the DDM. The aim is to generate runoff projections under different climate scenarios and use the results to help planing future water management strategies in the modeled catchments. 
+The MATILDA framework combines a simple positive degree-day routine (DDM) for computing glacier melt with the simple hydrological bucket model HBV (Bergström, 1986). Optionally, it can also be used with the glacier energy and mass balance model COSIPY (COupled Snow and Ice energy and MAss Balance in Python) instead of or alongside the DDM. The aim is to provide an easy-access open-source tool to assess the characteristics of small and medium-sized glacierized catchments and enable useres to estimate their future water resources for different climate change scenarios.
+MATILDA is an ongoing project and therefore a work in progress.
 
 ## Overview
 
-MATILDA uses a modified version of the pypdd tool (https://github.com/juseg/pypdd.git) to calculate runoff from the glacier(s) with a simple DegreeDayModel approach and a modified version of the LHMP tool (https://github.com/hydrogo/LHMP.git) which translates the HBV model into python. It can run on input data from COSIPY, the translation of the COSIMA model into python (https://github.com/cryotools/cosipy.git), and use the COSIPY output to simulate glacier melt instead of the DDM. The output is then combined and analyzed. The Nash-Sutcliffe efficiency coefficient is calculated to evaluate the predictive skills of the model and several plots are generated to give an overview of the data.
+In the basic setup, MATILDA uses a modified version of the pypdd tool (https://github.com/juseg/pypdd.git) to calculate runoff from the glacier(s) with a simple positive degree-day model approach and a modified version of the LHMP tool (https://github.com/hydrogo/LHMP.git). Alternatively, the glacial melt can be calculated using COSIPY (https://github.com/cryotools/cosipy.git) while when using both glacier routines a comparison is provided. The comprehensive output contains the modeled time series for various components of the water balance, basic statistics of these variables, the Nash-Sutcliffe efficiency coefficient to evaluate the predictive skills of the model, and several plots of in- and output data.
 
 ![](MATILDA_overview.png)
 
@@ -35,7 +36,7 @@ pip install git+https://git@github.com/anatappe/MATILDA.git
 ```
 ### Data
 
-The necessary input a either a csv with a time series of temperature (°C), precipitation (mm) and if possible evapotranspiration (mm) data in the following format or the output netcdf and csv from the COSIPY model. A series of runoff observations (mm) are used to validate the model output. At least daily data is required.
+The minimum input is a CSV-file containing timeseries of air temperature (°C), total precipitation (mm) and (if available) evapotranspiration (mm) data in the  format shown below. Alternatively, the model can be run on an input or output NetCDF-file, or input CSV-file of the COSIPY model. A series of runoff observations (mm) is used to validate the model output. At least daily data is required.
 
 | TIMESTAMP            | T2            | RRR            | PE            |
 | -------------        | ------------- | -------------  | ------------- |
@@ -49,23 +50,23 @@ The necessary input a either a csv with a time series of temperature (°C), prec
 | 2011-01-01    | 0.00          |
 
 
-It is also necessary to adjust the parameters of the DDM and the HBV model to the prevailing conditions in the test area. Since the DDM model calculates the glacier melt, it is necessary to scale the input data to the glacier. This can be done with a lapserate for temperature and precipitation and the height difference between the measurement station of the data and the glacier or with a DEM and glacier mask.
+It is also necessary to adjust the parameters of the DDM and the HBV model to the prevailing conditions in the model area. Since the DDM model calculates the glacier melt, it is necessary to scale the input data to the glacier. In the most simple manner, this can be achieved by using a lapse rate for temperature and precipitation and the elevation difference between the reference altitudes of the data and the glacier. Alternatively, a digital elevation model (DEM) and a glacier mask can be provided to MATILDA to derive the necessary elevation values automatically.
 
 ### Workflow
 
-The MATILDA package consists of four different modules: DDM, HBV, plots and statistics which have different submodules for the individual steps. 
+The MATILDA package consists of four different modules: DDM, HBV, plots, and statistics which have different submodules for the individual steps. 
 To use the whole package, the following steps are recommended:
-- read in your data and define a spin up and simulation period
-- if you only use a csv, define a lapse rate for temperature and precpitation and a height difference between your data and the mean glacier height to downscale your dataframe for the DDM
-- define the output frequency (daily, weekly, monthly or yearly)
-- use the DDM module to calculate the positive degree days and use the output dataset to run the DDM. Specify the degree day factors here
-- run the HBV model with your dataframe. Adjust the parameters for the accordingly. If evapotranspiration is not available, it is calculated automatically
-- merge the two output dataframe with your observations to calculate the Nash–Sutcliffe model efficiency coefficient and perform a simple statistical analysis with the tools from the stats module
-- plot runoff, meteorological parameters and HBV output series with the plots module 
+- Read your data and define a spin-up and simulation period
+- If you only use a CSV, define a lapse rate for temperature and precpitation and an elevation difference between your data reference altitude and the mean glacier altitude to downscale your dataframe for the DDM
+- Define the output frequency (daily, weekly, monthly or yearly)
+- Use the DDM module to calculate the positive degree days and use the output dataset to run the DDM. Specify the degree day factors and lapse rates here.
+- Run the HBV model with your dataframe. Adjust the parameters for the accordingly. If evapotranspiration is not available, it is calculated automatically
+- Merge the two output dataframe with your observations to calculate the Nash–Sutcliffe model efficiency coefficient and perform a simple statistical analysis using the tools from the stats module
+- Plot runoff, meteorological parameters, and HBV output series with the plots module 
 
 An example script for the workflow can be found [here](example_workflow.py).
 
-## Built With
+## Built using
 * [Python](https://www.python.org) - Python
 * [COSIPY](https://github.com/cryotools/cosipy.git) - COupled Snow and Ice energy and MAss Balance in Python
 * [pypdd](https://github.com/juseg/pypdd.git) - Python positive degree day model for glacier surface mass balance
