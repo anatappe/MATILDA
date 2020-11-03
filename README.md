@@ -56,13 +56,13 @@ It is also necessary to adjust the parameters of the DDM and the HBV model to th
 
 The MATILDA package consists of four different modules: DDM, HBV, plots, and statistics which have different submodules for the individual steps. 
 To use the whole package, the following steps are recommended:
-- Read your data and define a spin-up and simulation period
-- If you only use a CSV, define a lapse rate for temperature and precpitation and an elevation difference between your data reference altitude and the mean glacier altitude to downscale your dataframe for the DDM
-- Define the output frequency (daily, weekly, monthly or yearly)
+- Read your data and define a spin-up and simulation period.
+- If you only use a CSV, define a lapse rate for temperature and precpitation and an elevation difference between your data reference altitude and the mean glacier altitude to downscale your dataframe for the DDM.
+- Define the output frequency (daily, weekly, monthly or yearly).
 - Use the DDM module to calculate the positive degree days and use the output dataset to run the DDM. Specify the degree day factors and lapse rates here.
-- Run the HBV model with your dataframe. Adjust the parameters for the accordingly. If evapotranspiration is not available, it is calculated automatically
-- Merge the two output dataframe with your observations to calculate the Nash–Sutcliffe model efficiency coefficient and perform a simple statistical analysis using the tools from the stats module
-- Plot runoff, meteorological parameters, and HBV output series with the plots module 
+- Run the HBV model with your dataframe. Adjust the parameters for the accordingly. If evapotranspiration is not available, it is calculated automatically.
+- Merge the two output dataframe with your observations to calculate the Nash–Sutcliffe model efficiency coefficient and perform a simple statistical analysis using the tools from the stats module.
+- Plot runoff, meteorological parameters, and HBV output series using the plots module. 
 
 An example script for the workflow can be found [here](example_workflow.py).
 
