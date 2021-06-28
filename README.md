@@ -23,6 +23,7 @@ It requires the following Python3 libraries:
 - scipy
 - os
 - datetime
+- hydroeval
 
 The MATILDA package and the necessary packages can be installed to you local machine by using pip. Just navigate into the cloned folder and use the following command
 ```
@@ -54,15 +55,18 @@ It is also necessary to adjust the parameters of the DDM and the HBV model to th
 
 ### Workflow
 
-The MATILDA package consists of four different modules: DDM, HBV, plots, and statistics which have different submodules for the individual steps. 
+The MATILDA package consists of four different modules: setting up the parameters, data preprocessing, the actual simulation and plots. All modules can be used individually or as one routine called MATILDA_simulation. 
 To use the whole package, the following steps are recommended:
-- Read your data and define a spin-up and simulation period.
-- If you only use a CSV, define a lapse rate for temperature and precpitation and an elevation difference between your data reference altitude and the mean glacier altitude to downscale your dataframe for the DDM.
+- Read your data and set the parameters with the parameter function.
+- Define the set up and simulation period. One year of setting up is recommended.
+- Define the catchment properties like area and elevation. The elevation of your data is required for the downscaling.
 - Define the output frequency (daily, weekly, monthly or yearly).
-- Use the DDM module to calculate the positive degree days and use the output dataset to run the DDM. Specify the degree day factors and lapse rates here.
-- Run the HBV model with your dataframe. Adjust the parameters for the accordingly. If evapotranspiration is not available, it is calculated automatically.
-- Merge the two output dataframe with your observations to calculate the Nash–Sutcliffe model efficiency coefficient and perform a simple statistical analysis using the tools from the stats module.
+- Set all the parameters for the glacier and hydrological routines. If no parameters are set, the standart values are used.
+- Run the data preprocessing.
+- Run the actual simulation.
+- The simulation will give you a quick overview over the data and if you have observations, the Nash–Sutcliffe model efficiency coefficient and KGE is calculated.
 - Plot runoff, meteorological parameters, and HBV output series using the plots module. 
+- All the output including the plots and parameters can be saved to your computer with the save_output function.
 
 An example script for the workflow can be found [here](example_workflow.py).
 
