@@ -7,7 +7,7 @@ MATILDA is an ongoing project and therefore a work in progress.
 
 In the basic setup, MATILDA uses a modified version of the pypdd tool (https://github.com/juseg/pypdd.git) to calculate runoff from the glacier(s) with a simple positive degree-day model approach and a modified version of the LHMP tool (https://github.com/hydrogo/LHMP.git). The comprehensive output contains the modeled time series for various components of the water balance, basic statistics of these variables, the Nash-Sutcliffe efficiency coefficient and optionally the KGE to evaluate the predictive skills of the model, and several plots of in- and output data.
 
-![](workflow_general-Full.png)
+![](workflow_detailed-Full.png)
 
 ### Requirements
 
