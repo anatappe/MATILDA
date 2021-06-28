@@ -55,18 +55,18 @@ It is also necessary to adjust the parameters of the DDM and the HBV model to th
 
 ### Workflow
 
-The MATILDA package consists of four different modules: setting up the parameters, data preprocessing, the actual simulation and the plots. All modules can be used individually or as one routine called MATILDA_simulation. 
+The MATILDA package consists of four different modules: setting up the parameters, data preprocessing, the actual simulation and the plots. All modules can be used individually or as one routine called *MATILDA_simulation*. 
 To use the whole package, the following steps are recommended:
-- Read in your data and set the parameters with the parameter function.
+- Read in your data and set the parameters with the parameter function *MATILDA_parameter*.
 - Define the set up and simulation period. One year of setting up is recommended.
 - Define properties like area and elevation for your catchment for the catchment and if part of the catchment glacier area (if not set it to 0). The elevation of your data is required for the downscaling.
 - Define the output frequency (daily, weekly, monthly or yearly).
 - Set all the parameters for the glacier and hydrological routines. If no parameters are set, the standart values are used.
-- Run the data preprocessing.
-- Run the actual simulation.
+- Run the data preprocessing with *MATILDA_preproc*.
+- Run the actual simulation with *MATILDA_submodules*.
 - The simulation will give you a quick overview over the data and if you have observations, the Nash–Sutcliffe model efficiency coefficient and KGE is calculated.
-- Plot runoff, meteorological parameters, and HBV output series using the plots module. 
-- All the output including the plots and parameters can be saved to your computer with the save_output function.
+- Plot runoff, meteorological parameters, and HBV output series using the plots module *MATILDA_plots*. 
+- All the output including the plots and parameters can be saved to your computer with the save_output function *MATILDA_save_output*.
 
 An example script for the workflow can be found [here](example_workflow.py).
 
